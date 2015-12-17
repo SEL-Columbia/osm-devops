@@ -14,7 +14,7 @@ To deploy to a host for a data collection effort:
 
 ## Deployment Architecture [Production]
 
-.
+<pre>
 +-- host
 |   +-- docker-compose
 |   |   +-- db (docker container)
@@ -24,6 +24,7 @@ To deploy to a host for a data collection effort:
 |   |   |   +-- nginx
 |   |   |   +-- rails
 |   |   |   +-- cgimap
+</pre>
 
 docker-compose is configured to map traffic on port from the host to the gridmaps container.  
 
