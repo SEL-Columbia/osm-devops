@@ -1,0 +1,33 @@
+gridmaps:
+    image: "selcolumbia/osm-gridmaps"
+    links:
+      - "db:db"
+    volumes:
+      - ./database.yml:/home/app/openstreetmap-website/config/database.yml
+      - ./application.yml:/home/app/openstreetmap-website/config/application.yml
+      - ./gridmaps-nginx.conf:/etc/nginx/sites-enabled/gridmaps-nginx.conf
+
+gridmaps-cgimap:
+    image: "selcolumbia/osm-gridmaps-cgimap"
+    links:
+      - "db:db"
+    volumes:
+      - ./database.yml:/home/app/openstreetmap-website/config/database.yml
+      - ./application.yml:/home/app/openstreetmap-website/config/application.yml
+      - ./gridmaps-nginx-cgimap.conf:/etc/nginx/sites-enabled/gridmaps-nginx-cgimap.conf
+    ports:
+      - "80:80"
+
+db:
+    image: "selcolumbia/osm-db"
+
+dev:
+    image: "selcolumbia/osm-gridmaps-dev"
+    volumes:
+      - ~/src/openstreetmap-website/:/src/openstreetmap-website
+      - ./database.yml:/openstreetmap-website/config/database.yml
+      - ./application.yml:/openstreetmap-website/config/application.yml
+    links:
+      - "db:db"
+    ports:
+      - "3000:3000"
