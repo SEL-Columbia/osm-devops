@@ -39,6 +39,9 @@ WORKDIR /root
 RUN mkdir -p /etc/my_init.d
 ADD init.sh /etc/my_init.d/init.sh
 
+# and script to add admin user if not there
+ADD add_admin.rb /home/app/add_admin.rb
+
 # disable default site
 RUN rm /etc/nginx/sites-enabled/default
 
