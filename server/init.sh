@@ -15,6 +15,15 @@ sudo -u app RAILS_ENV=production rake db:migrate
 echo "adding admin user if not done..."
 sudo -u app rails runner -e production /home/app/add_admin.rb 
 
+echo "registering id as client if not done..."
+sudo -u app rails runner -e production /home/app/add_id_client.rb 
+
+# sub the id client key into application.yml
+if [[ -f config/application.yml ]]; then 
+    id_key=`psql -h db -d osm -U postgres -tA -c "select key from client_applications where name='iD';"`
+    sed -i "s/<id_key>/$id_key/" config/application.yml
+fi
+
 sudo -u app RAILS_ENV=production rake assets:precompile
 
 # set the SECRET_KEY for prod on each startup
