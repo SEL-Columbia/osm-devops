@@ -30,11 +30,11 @@ Tested with Debian "jessie" instructions [here](https://docs.docker.com/engine/i
 ### Configure osm application
 
 - application.yml
-	- copy example.application.yml to application.yml
+	- copy example.application.yml to application.yml (this will be added as a volume to osm config dir)
 	- edit any necessary params
     - NOTE:  signup/registration will not happen properly without setting up a working mail server and account 
 
-- copy example.database.yml to database.yml and edit appropriately (shouldn't need to change)
+- copy example.database.yml to database.yml and edit appropriately (will also be added as a volume)
 
 ### Run
 

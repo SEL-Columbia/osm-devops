@@ -3,8 +3,12 @@ gridmaps:
     links:
       - "db:db"
     volumes:
+      # note that application.yml is placed in tmp because it will be modified
+      # by server/init.sh before being copied into osm config dir.
+      # database.yml and nginx.conf are mounted directly because they're not
+      # modified in container.
+      - ./application.yml:/tmp/application.yml
       - ./database.yml:/home/app/openstreetmap-website/config/database.yml
-      - ./application.yml:/home/app/openstreetmap-website/config/application.yml
       - ./gridmaps-nginx.conf:/etc/nginx/sites-enabled/gridmaps-nginx.conf
 
 gridmaps-cgimap:
@@ -12,8 +16,8 @@ gridmaps-cgimap:
     links:
       - "db:db"
     volumes:
+      - ./application.yml:/tmp/application.yml
       - ./database.yml:/home/app/openstreetmap-website/config/database.yml
-      - ./application.yml:/home/app/openstreetmap-website/config/application.yml
       - ./gridmaps-nginx-cgimap.conf:/etc/nginx/sites-enabled/gridmaps-nginx-cgimap.conf
     ports:
       - "80:80"
