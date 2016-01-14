@@ -77,3 +77,36 @@ docker build -t selcolumbia/osm-gridmaps ./server
 docker build -t selcolumbia/osm-gridmaps-cgimap ./server-cgimap
 docker build -t selcolumbia/osm-gridmaps-dev ./server-dev
 ```
+
+## Development workflow
+
+Development for the openstreetmap-website fork should be done in the SEL-Columbia/openstreetmap-website repository.  
+
+#### Branch organization:
+- master:  should be synchronized with upstream openstreetmap/openstreetmap-website regularly (fork changes are not applied here)
+- gridmaps:  "production" SEL openstreetmap-website fork.  This should be deployable at all times.  Nothing untested should make it in here.
+- gridmaps-<branch>:  Any changes to fork code to be merged in a pull-request to gridmaps
+- gridmaps-<deployment>:  Any prior deployments in case bug fixes need to be made
+
+#### Testing
+
+Testing can be done via docker-compose.  
+
+1.  Checkout the branch you want to test
+2.  Update the ```dev``` service in docker-compose.yml to refer to your local checkout of openstreetmap-website.
+3.  Bring up the services via:
+
+```
+docker-compose run dev bash
+```
+
+4.  At the prompt, navigate to your mounted source dir and run the tests:
+
+```
+cd /src/openstreetmap-website
+bundle install
+rake test
+```
+
+Once a branch has been tested in a dev environment, it can be merged into the gridmaps branch and regression tested.
+From there it can be deployed to a previously configured environment.
