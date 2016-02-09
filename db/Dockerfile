@@ -1,5 +1,5 @@
 # Docker image for openstreetmap-website db
-FROM postgres
+FROM postgres:9.4
 MAINTAINER Chris Natali
 
 # setup requirements for building lib functions
