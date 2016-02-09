@@ -48,7 +48,7 @@ Tested with Debian "jessie" instructions [here](https://docs.docker.com/engine/i
 - Login to the admin account with user/password admin/admin
 - CHANGE THE PASSWORD for the admin account!
 - Users should register via the "Sign Up" link
-- Manage users as appropriate via <server>/users
+- Manage users as appropriate via UI at ```<server>/users``` endpoint
 
 ## Deployment Architecture [Production]
 
@@ -83,10 +83,29 @@ docker build -t selcolumbia/osm-gridmaps-dev ./server-dev
 Development for the openstreetmap-website fork should be done in the SEL-Columbia/openstreetmap-website repository.  
 
 #### Branch organization:
-- master:  should be synchronized with upstream openstreetmap/openstreetmap-website regularly (fork changes are not applied here)
-- gridmaps:  "production" SEL openstreetmap-website fork.  This should be deployable at all times.  Nothing untested should make it in here.
-- gridmaps-<branch>:  Any changes to fork code to be merged in a pull-request to gridmaps
-- gridmaps-<deployment>:  Any prior deployments in case bug fixes need to be made
+- ```master```:  should be synchronized with upstream openstreetmap/openstreetmap-website regularly (fork changes are not applied here)
+- ```gridmaps```:  "production" SEL openstreetmap-website fork.  This should be deployable at all times.  Nothing untested should make it in here.
+- ```gridmaps-<branch>```:  Any changes to fork code to be merged in a pull-request to gridmaps
+- ```gridmaps-<deployment>```:  Any prior deployments in case bug fixes need to be made
+
+#### Git flow for fix/feature
+
+- update master from upstream
+```
+git fetch upstream
+git checkout master
+git merge upstream/master
+```
+
+- create branch to apply fixes to
+```
+git checkout master
+git checkout -b gridmaps-<feature_or_fix>
+git merge gridmaps
+```
+
+- Once changes have been tested, issue PR to merge ```gridmaps-<feature_or_fix>``` into gridmaps branch
+
 
 #### Testing
 
@@ -105,8 +124,20 @@ docker-compose run dev bash
 ```
 cd /src/openstreetmap-website
 bundle install
+rake db:migrate RAILS_ENV=test
 rake test
 ```
 
-Once a branch has been tested in a dev environment, it can be merged into the gridmaps branch and regression tested.
-From there it can be deployed to a previously configured environment.
+#### Backups
+
+Backups are currently ad-hoc. 
+
+- Backup the osm-db container's osm db (sql dump that clears existing entities first):
+```
+docker exec -t root_db_1 pg_dump -d osm -U postgres -c > backup/osm_dump.sql
+```
+
+- Populate/Restore an osm-db container's osm db via the dump (change -d osm to osm_dev for development):
+```
+cat osm_dump.sql | docker exec -i osmdevops_db_1 psql -U postgres -d osm
+```

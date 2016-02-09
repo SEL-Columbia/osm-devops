@@ -1,5 +1,5 @@
 # Docker "osm-gridmaps" image for openstreetmap-website server
-FROM phusion/passenger-ruby20
+FROM phusion/passenger-ruby20:0.9.18
 MAINTAINER Chris Natali
 
 # Set correct environment variables.
@@ -19,7 +19,12 @@ RUN apt-get update && apt-get -y install \
   libxml2-dev \
   libxslt1-dev \
   nodejs \
-  postgresql 
+  wget
+
+# now postgres version 9.4
+RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ trusty-pgdg main" > /etc/apt/sources.list.d/pgdg.list
+RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
+RUN apt-get update && apt-get -y install postgresql-9.4
 
 RUN gem install bundler
 
