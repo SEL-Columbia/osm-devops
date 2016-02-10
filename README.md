@@ -132,11 +132,22 @@ rake db:migrate RAILS_ENV=test
 rake test
 ```
 
+Note that you can save time with the bundle install step if you commit a working image with appropriate gems installed
+
+5.  You can test the gridmaps or gridmaps-cgimap image via:
+
+```
+docker-compose run gridmaps bash -c "cd /home/app/openstreetmap-website; cp /tmp/application.yml config/application.yml; rake test test/models/trace_test.rb"
+```
+
+Note the need to copy the /tmp/application.yml file into the config dir in order for tests to pass
+
 #### Backups
 
 Backups are currently ad-hoc. 
 
 - Backup the osm-db container's osm db (sql dump that clears existing entities first):
+
 ```
 docker exec -t root_db_1 pg_dump -d osm -U postgres -c > backup/osm_dump.sql
 ```

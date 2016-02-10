@@ -1,5 +1,5 @@
 # Docker "osm-gridmaps-cgimap" image for openstreetmap-website server + cgimap
-FROM selcolumbia/osm-gridmaps:0.1
+FROM selcolumbia/osm-gridmaps:0.2
 MAINTAINER Chris Natali
 
 # cgimap dependencies
