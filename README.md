@@ -90,6 +90,11 @@ Development for the openstreetmap-website fork should be done in the SEL-Columbi
 
 #### Git flow for fix/feature
 
+Use a simple feature-branch workflow.  
+Since the gridmaps branch contains our SEL-specific customizations, we should use it to create feature branches from.
+That said, regular synchronization with upstream/master should be done since the OSM folks are constantly improving things.
+YMMV, but one approach to doing this is:
+
 - update master from upstream
 ```
 git fetch upstream
@@ -97,15 +102,14 @@ git checkout master
 git merge upstream/master
 ```
 
-- create branch to apply fixes to
+- create gridmaps-feature branch with latest from upstream + SEL customizations
 ```
-git checkout master
-git checkout -b gridmaps-<feature_or_fix>
-git merge gridmaps
+git checkout gridmaps
+git checkout -b gridmaps-feature
+git merge master
 ```
 
 - Once changes have been tested, issue PR to merge ```gridmaps-<feature_or_fix>``` into gridmaps branch
-
 
 #### Testing
 
