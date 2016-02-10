@@ -23,6 +23,11 @@ RUN apt-get update && apt-get -y install \
 WORKDIR /
 RUN git clone git://github.com/zerebubuth/openstreetmap-cgimap.git
 WORKDIR /openstreetmap-cgimap
+# hack to workaround the fact that these aren't configurable yet
+RUN sed -i 's/#define MAX_AREA .*$/#define MAX_AREA 1000\.0/' src/api06/map_handler.cpp 
+RUN sed -i 's/#define MAX_AREA .*$/#define MAX_AREA 1000\.0/' src/api07/map_handler.cpp 
+RUN sed -i 's/#define MAX_NODES .*$/#define MAX_NODES 100000/' src/api06/map_handler.cpp 
+RUN sed -i 's/#define MAX_NODES .*$/#define MAX_NODES 100000/' src/api07/map_handler.cpp 
 RUN ./autogen.sh
 RUN ./configure --with-fcgi=/usr --with-boost-libdir=/usr/lib/x86_64-linux-gnu
 RUN make && make install
