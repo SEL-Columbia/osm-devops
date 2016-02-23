@@ -12,7 +12,7 @@ gridmaps:
       - ./gridmaps-nginx.conf:/etc/nginx/sites-enabled/gridmaps-nginx.conf
 
 gridmaps-cgimap:
-    image: "selcolumbia/osm-gridmaps-cgimap:0.3"
+    image: "selcolumbia/osm-gridmaps-cgimap:0.4"
     links:
       - "db:db"
     volumes:
