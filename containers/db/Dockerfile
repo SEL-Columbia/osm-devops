@@ -1,6 +1,6 @@
 # Docker image for openstreetmap-website db
 FROM postgres:9.4
-MAINTAINER Chris Natali
+MAINTAINER Flávio Briz
 
 # setup requirements for building lib functions
 RUN apt-get update && apt-get -y install \
@@ -18,5 +18,4 @@ RUN apt-get -y install postgresql-server-dev-all
 # build library functions for install in db
 ADD osm_build_lib_functions.sh /tmp/
 RUN bash /tmp/osm_build_lib_functions.sh
-
 ADD init.sh /docker-entrypoint-initdb.d/

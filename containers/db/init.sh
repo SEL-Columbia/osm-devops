@@ -7,9 +7,9 @@ psql -U "$POSTGRES_USER" -c "CREATE DATABASE osm_test OWNER postgres TEMPLATE te
 psql -U "$POSTGRES_USER" -c "CREATE DATABASE osm_dev OWNER postgres TEMPLATE template1;"
 
 # Setup the tile functions in the dev/prod db's
-# assumes tile functions have been built 
+# assumes tile functions have been built
 for osm_env in "osm_dev" "osm_test" "osm"
-do 
+do
     psql -U "$POSTGRES_USER" -d $osm_env -c "CREATE EXTENSION btree_gist;"
     psql -U "$POSTGRES_USER" -d $osm_env -c "CREATE FUNCTION maptile_for_point(int8, int8, int4) RETURNS int4 AS '/openstreetmap-website/db/functions/libpgosm', 'maptile_for_point' LANGUAGE C STRICT;"
     psql -U "$POSTGRES_USER" -d $osm_env -c "CREATE FUNCTION tile_for_point(int4, int4) RETURNS int8 AS '/openstreetmap-website/db/functions/libpgosm', 'tile_for_point' LANGUAGE C STRICT;"

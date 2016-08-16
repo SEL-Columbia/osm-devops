@@ -1,6 +1,6 @@
-# Docker "osm-gridmaps" image for openstreetmap-website server
+# Docker "openstreetmap-website" image for openstreetmap-website server
 FROM phusion/passenger-ruby20:0.9.18
-MAINTAINER Chris Natali
+MAINTAINER Flávio Briz
 
 # Set correct environment variables.
 ENV HOME /root
