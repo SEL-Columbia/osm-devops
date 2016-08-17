@@ -1,44 +1,54 @@
 # Docker "openstreetmap-website" image for openstreetmap-website server
-FROM phusion/passenger-ruby20:0.9.18
+FROM debian:jessie
 MAINTAINER Flávio Briz
 
-# Set correct environment variables.
-ENV HOME /root
+# Passenger repository configuration
+RUN apt-get update \
+	&& apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 561F9B9CAC40B2F7 \
+	&& apt-get install -y apt-transport-https ca-certificates \
+	&& sh -c 'echo deb https://oss-binaries.phusionpassenger.com/apt/passenger jessie main > /etc/apt/sources.list.d/passenger.list' \
+	&& apt-get update \
+	&& apt-get upgrade -y
 
-# Use baseimage-docker's init process.
-CMD ["/sbin/my_init"]
-
-# install dependencies
-RUN apt-get update && apt-get -y install \
-  build-essential \
-  git-core \
-  imagemagick \
-  libmagickwand-dev \
-  libpq-dev \
-  libsasl2-dev \
-  libxml2-dev \
-  libxslt1-dev \
-  nodejs \
-  wget \
-  zip
-
-# now postgres version 9.4
-RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ trusty-pgdg main" > /etc/apt/sources.list.d/pgdg.list
-RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
-RUN apt-get update && apt-get -y install postgresql-9.4
+# install packages
+RUN apt-get install -y --fix-missing \
+	gnupg \
+	build-essential \
+	ruby \
+	libruby \
+	ruby-dev \
+    libmagickwand-dev \
+	libxml2-dev \
+	libxslt1-dev \
+	nodejs \
+    build-essential \
+	postgresql \
+	postgresql-contrib \
+	libpq-dev \
+	postgresql-server-dev-all \
+	libsasl2-dev \
+	imagemagick \
+	nginx \
+	nginx-extras \
+	passenger \
+	&& ln -sf /usr/bin/nodejs /usr/local/bin/node # Fix for nodejs on debian >= 8
 
 RUN gem install bundler
 
-# Run nginx in bg on init
-RUN rm -f /etc/service/nginx/down
+# NGINX configuration
+RUN rm -f /etc/service/nginx/down \
+	&& sed -i "s/include \/etc\/nginx\/passenger.conf;/include \/etc\/nginx\/passenger.conf;/" /etc/nginx/nginx.conf
 
 # get openstreetmap and put it into /home/app
+ADD ./src /home/app
 WORKDIR /home/app
-RUN git clone https://github.com/SEL-Columbia/openstreetmap-website.git
-WORKDIR /home/app/openstreetmap-website
-RUN git checkout gridmaps
-RUN chown -R app:app /home/app/openstreetmap-website
 RUN bundle install
+
+# Build database functions
+RUN cd db/functions \
+    && make
+
+# get openstreetmap and put it into /home/app
 WORKDIR /root
 
 # add init script
@@ -51,6 +61,10 @@ ADD add_id_client.rb /home/app/add_id_client.rb
 
 # disable default site
 RUN rm /etc/nginx/sites-enabled/default
+ADD ./osm-web-nginx.conf /etc/nginx/sites-enabled/osm-web-nginx.conf
 
 # Clean up APT when done.
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+EXPOSE 80 443
+CMD ["nginx", "-g", "daemon off;"]

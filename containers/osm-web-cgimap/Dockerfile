@@ -1,6 +1,6 @@
 # Docker "osm-gridmaps-cgimap" image for openstreetmap-website server + cgimap
-FROM selcolumbia/osm-gridmaps:0.2
-MAINTAINER Chris Natali
+FROM osm/web
+MAINTAINER Flávio Briz
 
 # cgimap dependencies
 RUN apt-get update && apt-get -y install \
@@ -17,17 +17,20 @@ RUN apt-get update && apt-get -y install \
   libboost-filesystem-dev \
   libboost-system-dev \
   libmemcached-dev \
-  zlib1g-dev
+  zlib1g-dev \
+  wget
 
 # now cgimap setup
 WORKDIR /
-RUN git clone git://github.com/zerebubuth/openstreetmap-cgimap.git
-WORKDIR /openstreetmap-cgimap
+RUN wget https://github.com/openstreetmap/cgimap/archive/master.tar.gz -O openstreetmap-cgimap.tar.gz
+RUN tar -xf openstreetmap-cgimap.tar.gz && rm openstreetmap-cgimap.tar.gz
+
+WORKDIR /cgimap-master
 # hack to workaround the fact that these aren't configurable yet
-RUN sed -i 's/#define MAX_AREA .*$/#define MAX_AREA 100\.0/' src/api06/map_handler.cpp 
-RUN sed -i 's/#define MAX_AREA .*$/#define MAX_AREA 100\.0/' src/api07/map_handler.cpp 
-RUN sed -i 's/#define MAX_NODES .*$/#define MAX_NODES 50000/' src/api06/map_handler.cpp 
-RUN sed -i 's/#define MAX_NODES .*$/#define MAX_NODES 50000/' src/api07/map_handler.cpp 
+RUN sed -i 's/#define MAX_AREA .*$/#define MAX_AREA 100\.0/' src/api06/map_handler.cpp
+RUN sed -i 's/#define MAX_AREA .*$/#define MAX_AREA 100\.0/' src/api07/map_handler.cpp
+RUN sed -i 's/#define MAX_NODES .*$/#define MAX_NODES 50000/' src/api06/map_handler.cpp
+RUN sed -i 's/#define MAX_NODES .*$/#define MAX_NODES 50000/' src/api07/map_handler.cpp
 RUN ./autogen.sh
 RUN ./configure --with-fcgi=/usr --with-boost-libdir=/usr/lib/x86_64-linux-gnu
 RUN make && make install
@@ -35,8 +38,12 @@ RUN ldconfig /usr/local/lib
 WORKDIR /root
 
 # include cgimap run script
-RUN mkdir /etc/service/cgimap
+RUN mkdir -p /etc/service/cgimap
 ADD cgimap_run.sh /etc/service/cgimap/run
+
+# disable default site
+RUN rm /etc/nginx/sites-enabled/*
+ADD ./osm-cgimap-nginx.conf /etc/nginx/sites-enabled/osm-cgimap-nginx.conf
 
 # Clean up APT when done.
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
