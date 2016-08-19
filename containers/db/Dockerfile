@@ -1,21 +1,67 @@
-# Docker image for openstreetmap-website db
+##### From https://github.com/gordlea/docker-postgis #####
 FROM postgres:9.4
-MAINTAINER Flávio Briz
+MAINTAINER "Flávio Briz <tech@beeline-app.com>"
 
-# setup requirements for building lib functions
-RUN apt-get update && apt-get -y install \
-  build-essential \
-  git-core \
-  imagemagick \
-  libmagickwand-dev \
-  libpq-dev \
-  libsasl2-dev \
-  libxml2-dev \
-  libxslt1-dev
+RUN apt-get update && apt-get install -y --no-install-suggests gcc
+RUN apt-get install -y --no-install-suggests postgresql-server-dev-9.4
+RUN apt-get install -y --no-install-suggests libxml2-dev
+RUN apt-get install -y --no-install-suggests libgdal-dev
+RUN apt-get install -y --no-install-suggests libproj-dev
+RUN apt-get install -y --no-install-suggests libjson0-dev
+RUN apt-get install -y --no-install-suggests xsltproc
+RUN apt-get install -y --no-install-suggests libopenthreads-dev
+RUN apt-get install -y --no-install-suggests libopenscenegraph-dev
+RUN apt-get install -y --no-install-suggests docbook-xsl
+RUN apt-get install -y --no-install-suggests docbook-mathml
+RUN apt-get install -y --no-install-suggests libpcre3-dev
+RUN apt-get install -y --no-install-suggests cmake
+RUN apt-get install -y --no-install-suggests libcgal-dev
+RUN apt-get install -y --no-install-suggests openscenegraph
+RUN apt-get install -y --no-install-suggests imagemagick
 
-RUN apt-get -y install postgresql-server-dev-all
+#latest osgeo
+RUN wget http://download.osgeo.org/geos/geos-3.5.0.tar.bz2; \
+    tar xfj geos-3.5.0.tar.bz2; \
+    cd geos-3.5.0; \
+    ./configure; \
+    make -j; \
+    make install; \
+    cd ..; \
+    rm -rf geos-3.5.0*
 
-# build library functions for install in db
-ADD osm_build_lib_functions.sh /tmp/
-RUN bash /tmp/osm_build_lib_functions.sh
-ADD init.sh /docker-entrypoint-initdb.d/
+RUN wget http://download.osgeo.org/postgis/source/postgis-2.2.0.tar.gz; \
+    tar xvzf postgis-2.2.0.tar.gz; \
+    cd postgis-2.2.0; \
+    ./configure --with-raster --with-topology \
+    make -j; \
+    make install; \
+    cd ..; \
+    rm -rf postgis-2.2.0*
+
+RUN ldconfig
+
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+      wget \
+      ca-certificates \
+ && rm -rf /var/lib/apt/lists/*
+
+ENV CARTODB_DIR=/opt/cartodb-postgresql \
+    VT_UTIL_DIR=/opt/postgis-vt-util \
+    VT_UTIL_URL="https://raw.githubusercontent.com/mapbox/postgis-vt-util/v1.0.0/postgis-vt-util.sql"
+
+RUN mkdir -p /opt/postgis-vt-util \
+ && wget -P /opt/postgis-vt-util --quiet "$VT_UTIL_URL"
+
+# install github.com/elitwin/pgtune
+RUN wget https://github.com/elitwin/pgtune/tarball/master \
+   && tar -xzf master \
+   && mv elitwin* pgtune \
+   && rm -rf master
+
+# copy new initdb file which enables the hstore extension and Mapbox vt-util functions
+RUN rm -f /docker-entrypoint-initdb.d/postgis.sh
+COPY ./libpgosm.so /libpgosm.so
+COPY ./osmdw_pgtune.sh /docker-entrypoint-initdb.d/05_osmdw_pgtune.sh
+COPY ./initdb-postgis.sh /docker-entrypoint-initdb.d/10_postgis.sh
+COPY ./initdb-osm.sh /docker-entrypoint-initdb.d/20_osm.sh

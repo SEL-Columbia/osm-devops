@@ -1,6 +1,6 @@
 # Docker "osm-gridmaps-cgimap" image for openstreetmap-website server + cgimap
 FROM osm/web
-MAINTAINER Flávio Briz
+MAINTAINER "Flávio Briz <tech@beeline-app.com>"
 
 # cgimap dependencies
 RUN apt-get update && apt-get -y install \

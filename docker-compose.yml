@@ -30,14 +30,3 @@ services:
       - "5432"
     volumes:
       - database:/var/lib/postgresql/data
-
-#  dev:
-#    image: "osm/web-dev"
-#    volumes:
-#      - ~/src/openstreetmap-website/:/src/openstreetmap-website
-#      - ./database.yml:/openstreetmap-website/config/database.yml
-#      - ./application.yml:/openstreetmap-website/config/application.yml
-#    depends_on:
-#      - db
-#    ports:
-#      - "3000:3000"
