@@ -5,10 +5,10 @@ volumes:
     driver: local
 
 services:
-  web:
-    image: "osm/web"
-    depends_on:
-      - db
+  #  web:
+  #    image: "osm/web"
+  #    depends_on:
+  #      - db
 
   web-cgimap:
     image: "osm/web-cgimap"

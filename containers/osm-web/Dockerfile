@@ -37,19 +37,18 @@ RUN gem install bundler
 
 # NGINX configuration
 RUN rm -f /etc/service/nginx/down \
-	&& sed -i "s/include \/etc\/nginx\/passenger.conf;/include \/etc\/nginx\/passenger.conf;/" /etc/nginx/nginx.conf
+	&& sed -i "s/# include \/etc\/nginx\/passenger.conf;/include \/etc\/nginx\/passenger.conf;/" /etc/nginx/nginx.conf
 
 # get openstreetmap and put it into /home/app
 ADD ./src /home/app
+RUN useradd -ms /bin/bash app
+RUN chown -R app:app /home/app
 WORKDIR /home/app
 RUN bundle install
 
 # Build database functions
 RUN cd db/functions \
     && make
-
-# get openstreetmap and put it into /home/app
-WORKDIR /root
 
 # add init script
 RUN mkdir -p /etc/my_init.d
@@ -66,5 +65,12 @@ ADD ./osm-web-nginx.conf /etc/nginx/sites-enabled/osm-web-nginx.conf
 # Clean up APT when done.
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
+# forward request and error logs to docker log collector
+RUN ln -sf /dev/stdout /var/log/nginx/access.log \
+	&& ln -sf /dev/stderr /var/log/nginx/error.log
+
+COPY ./database.yml /home/app/config/database.yml
+COPY ./application.yml /home/app/config/application.yml
+
 EXPOSE 80 443
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["sh", "-c", "/etc/my_init.d/init.sh"]
