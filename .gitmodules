@@ -1,0 +1,6 @@
+[submodule "containers/osmosis/src"]
+	path = containers/osmosis/src
+	url = http://github.com/openstreetmap/osmosis
+[submodule "containers/osm-web/src"]
+	path = containers/osm-web/src
+	url = git@github.com:openstreetmap/openstreetmap-website

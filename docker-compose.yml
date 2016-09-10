@@ -1,37 +1,32 @@
-gridmaps:
-    image: "selcolumbia/osm-gridmaps:0.2"
-    links:
-      - "db:db"
-    volumes:
-      # note that application.yml is placed in tmp because it will be modified
-      # by server/init.sh before being copied into osm config dir.
-      # database.yml and nginx.conf are mounted directly because they're not
-      # modified in container.
-      - ./application.yml:/tmp/application.yml
-      - ./database.yml:/home/app/openstreetmap-website/config/database.yml
-      - ./gridmaps-nginx.conf:/etc/nginx/sites-enabled/gridmaps-nginx.conf
+version: '2'
 
-gridmaps-cgimap:
-    image: "selcolumbia/osm-gridmaps-cgimap:0.4"
-    links:
-      - "db:db"
-    volumes:
-      - ./application.yml:/tmp/application.yml
-      - ./database.yml:/home/app/openstreetmap-website/config/database.yml
-      - ./gridmaps-nginx-cgimap.conf:/etc/nginx/sites-enabled/gridmaps-nginx-cgimap.conf
+volumes:
+  database:
+    driver: local
+
+services:
+  #  web:
+  #    image: "osm/web"
+  #    depends_on:
+  #      - db
+
+  web-cgimap:
+    image: "osm/web-cgimap"
+    depends_on:
+      - db
     ports:
       - "80:80"
 
-db:
-    image: "selcolumbia/osm-db:0.1"
-
-dev:
-    image: "selcolumbia/osm-gridmaps-dev"
+  osmosis:
+    image: "osmosis"
+    depends_on:
+      - db
     volumes:
-      - ~/src/openstreetmap-website/:/src/openstreetmap-website
-      - ./database.yml:/openstreetmap-website/config/database.yml
-      - ./application.yml:/openstreetmap-website/config/application.yml
-    links:
-      - "db:db"
+      - ./import:/project/import
+
+  db:
+    image: "osm/db"
     ports:
-      - "3000:3000"
+      - "5432"
+    volumes:
+      - database:/var/lib/postgresql/data

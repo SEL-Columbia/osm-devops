@@ -1,0 +1,42 @@
+#!/bin/bash
+source ./scripts/dispatch.bash
+
+ORIG_PWD=$(pwd)
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+  DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+
+cd "$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+
+scripts=./scripts
+
+source ${scripts}/out.bash
+
+cat ${scripts}/logo.bash
+
+function help () {
+    out '
+<33>Available commands:<0>
+  <32;1>install<0>              Install and configure the full stack.<0>
+  <32;1>database<0>             Database access<0>
+  <32;1>restart<0>              Restart all containers.<0>
+'
+}
+
+if [ $# -gt 0 ]; then
+    if [ -f ${scripts}/$1.bash ]; then
+        source ${scripts}/$1.bash
+        shift
+        dispatch $*
+    else
+        help
+        out "<33;1>Command not found, please check help for more information.<0>"
+        exit 1
+    fi
+else
+    help
+    out "<33;1>No arguments passed<0>"
+fi

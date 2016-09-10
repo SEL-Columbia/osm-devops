@@ -2,11 +2,7 @@
 
 Simplifies deployment and management of short-lived openstreetmap instances for localized data gathering projects.
 
-Developed in support of [SEL's](http://sel.columbia.edu) electrification access initiatives.
-
-Builds are currently based on our [fork of openstreetmap-website](https://github.com/SEL-Columbia/openstreetmap-website) (aka "gridmaps").
-
-Experience with Docker is a prerequisite.
+Forked from [osm-devops](https://github.com/SEL-Columbia/osm-devops).
 
 ## Quick Setup
 
