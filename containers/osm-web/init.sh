@@ -20,7 +20,7 @@ su - app -c "rails runner -e production /home/app/add_id_client.rb"
 
 # sub the iD client key into application.yml and copy into config dir
 id_key=`psql -h db -d osm -U postgres -tA -c "select key from client_applications where name='iD';"`
-sed -i "s/<id_key>/$id_key/" config/application.yml
+sed -i "s/\%id_key\%/$id_key/" config/application.yml
 
 su - app -c "RAILS_ENV=production rake assets:precompile"
 
