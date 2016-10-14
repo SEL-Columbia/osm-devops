@@ -14,27 +14,29 @@ To deploy to a host for a data collection effort:
 
 ### Setup a server with docker and docker-compose
 
-- Setup a linux server securely with a user account, sudo and ssh access
-- Make user part of docker group:  ```gpasswd -a cjn docker```
-- install docker 
-- start it (depends on your system, but something like ```service start docker``` should work)
-
-Instructions can be found [here](https://docs.docker.com/engine/installation/)
-
-Tested with Debian "jessie" instructions [here](https://docs.docker.com/engine/installation/debian/#debian-jessie-80-64-bit)
+- Setup a linux server (make sure it's secure)
+- install docker (if not using an image with docker preinstalled)
+- install docker-compose via instructions [here](http://docs.master.dockerproject.org/compose/install/)
+- start docker if not done (depends on your system, but something like ```service start docker``` should work)
 
 ### Setup the osm-devops repository
 
 - clone this repo onto that server and cd into the clone dir
+
+```bash
+git clone https://github.com/SEL-Columbia/osm-devops
+cd osm-devops
+```
 
 ### Configure osm application
 
 - application.yml
 	- copy example.application.yml to application.yml (this will be added as a volume to osm config dir)
 	- edit any necessary params
-    - NOTE:  signup/registration will not happen properly without setting up a working mail server and account 
+      - Email related (mail* and email*) using a gmail email and their smtp service works
+      - NOTE:  signup/registration will not happen properly without setting up a working mail server and account 
 
-- copy example.database.yml to database.yml and edit appropriately (will also be added as a volume)
+- copy example.database.yml to database.yml
 
 ### Run
 

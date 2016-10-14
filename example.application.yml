@@ -97,17 +97,12 @@ defaults: &defaults
   mapquest_directions_url: "//open.mapquestapi.com/directions/v2/route"
   mapzen_valhalla_url: "//valhalla.mapzen.com/route"
   osrm_url: "//router.project-osrm.org/viaroute"
-  private_instance: false
 
 development:
   <<: *defaults
-  private_instance: true
-  gridmaps_tile_url:  "http://<tileserver>/tile/gridmaps/{z}/{x}/{y}.png"
 
 production:
   <<: *defaults
-  private_instance: true
-  gridmaps_tile_url:  "http://<tileserver>/tilestache/gridmaps/{z}/{x}/{y}.png"
 
 test:
   <<: *defaults

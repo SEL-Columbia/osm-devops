@@ -29,8 +29,6 @@ dev:
     image: "selcolumbia/osm-gridmaps-dev"
     volumes:
       - ~/src/openstreetmap-website/:/src/openstreetmap-website
-      - ./database.yml:/openstreetmap-website/config/database.yml
-      - ./application.yml:/openstreetmap-website/config/application.yml
     links:
       - "db:db"
     ports:
